@@ -1,0 +1,40 @@
+# Optional ingress: install an Ingress controller and set a real DNS name/TLS secret first.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: retailops
+  namespace: retailops
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: retailops.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: retailops-api
+                port:
+                  number: 8000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: retailops-api
+                port:
+                  number: 8000
+          - path: /ready
+            pathType: Exact
+            backend:
+              service:
+                name: retailops-api
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: retailops-web
+                port:
+                  number: 80
