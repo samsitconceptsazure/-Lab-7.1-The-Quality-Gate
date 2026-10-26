@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: retailops-config
+  namespace: retailops
+data:
+  JWT_EXPIRE_MINUTES: "60"
+  ADMIN_USERNAME: "admin"
+  WAREHOUSE_USERNAME: "warehouse"
+  CUSTOMER_USERNAME: "customer"

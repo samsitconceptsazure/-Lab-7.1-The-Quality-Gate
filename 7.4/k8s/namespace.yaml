@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: retailops
+  labels:
+    app.kubernetes.io/name: retailops
+    pod-security.kubernetes.io/enforce: restricted
