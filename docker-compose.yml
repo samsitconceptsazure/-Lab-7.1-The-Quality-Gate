@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-retailops}
+      POSTGRES_USER: ${POSTGRES_USER:-retailops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe_LocalDb_123!}
+    volumes:
+      - retailops_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-retailops} -d ${POSTGRES_DB:-retailops}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [retailops]
+  api:
+    build:
+      context: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://retailops:ChangeMe_LocalDb_123!@db:5432/retailops}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks: [retailops]
+  web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    ports:
+      - "8080:8080"
+    depends_on: [api]
+    networks: [retailops]
+volumes:
+  retailops_pgdata:
+networks:
+  retailops:
